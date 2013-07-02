@@ -1,5 +1,7 @@
 (function() {
 
+    // # TODO: Break repeaters out into their own attribute type
+
     "use strict";
 
     var DataBind = window.DataBind = function(key, value) {
@@ -45,9 +47,8 @@
 
                 if (Array.isArray(value)) { // if value is array, cloneNode repeater
                     var fragment = document.createDocumentFragment(),
-                        len = value.length,
                         elParent = el.parentNode;
-                    for (var i=0; i < len; i++) {
+                    for (var i=0, len=value.length; i < len; i++) {
                         var cloneNode = el.cloneNode(true);
                         cloneNode.innerHTML = value[i];
                         fragment.appendChild(cloneNode);
