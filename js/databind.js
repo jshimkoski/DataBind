@@ -68,7 +68,7 @@
                 }
 
                 self.set(key, value);
-            }
+            };
         },
         _isInput: function(el) {
             var bool = (el.tagName && el.tagName.toLowerCase() === "input") || (el.tagName && el.tagName.toLowerCase() === "textarea");
