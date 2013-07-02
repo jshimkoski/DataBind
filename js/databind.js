@@ -57,7 +57,7 @@
             }
         },
         _listenerHandler: function() {
-            self = this;
+            var self = this;
             return function (e) {
                 e = e || window.event;
                 var target = e.target || e.srcElement,
