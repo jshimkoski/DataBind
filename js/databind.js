@@ -23,6 +23,9 @@
                 this.model[key] = value || "";
                 this._changeHandler(key);
             } else {
+
+                // # TODO: fix object replacement/merge (breaks if setting single value in object form)
+
                 this.model = key;
                 var k = Object.keys(key),
                     length = k.length;
@@ -40,12 +43,28 @@
                 var el = binded[length],
                     value = this.get(key);
 
-                // # TODO: Check if value is array, if it is, cloneNode with separate values.
-
-                if (this._isInput(el)) {
-                    el.value = value;
+                if (Array.isArray(value)) { // if value is array, cloneNode repeater
+                    var fragment = document.createDocumentFragment(),
+                        len = value.length,
+                        elParent = el.parentNode;
+                    for (var i=0; i < len; i++) {
+                        var cloneNode = el.cloneNode(true);
+                        cloneNode.innerHTML = value[i];
+                        fragment.appendChild(cloneNode);
+                    }
+                    if (elParent) {
+                        elParent.innerHTML = "";
+                        elParent.appendChild(fragment);
+                    }
                 } else {
-                    el.innerHTML = value;
+
+                    // # TODO: check if previously an object (breaks repeating lists if switching type)
+
+                    if (this._isInput(el)) {
+                        el.value = value;
+                    } else {
+                        el.innerHTML = value;
+                    }
                 }
             }
         },
