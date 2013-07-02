@@ -51,33 +51,23 @@
         },
         _listener: function() {
             if (document.addEventListener) {
-                (function(self) {
-                    document.addEventListener('change', function (e) {
-                        e = e || window.event;
-                        var target = e.target || e.srcElement,
-                            key = target.getAttribute('data-bind'),
-                            value = target.value;
-                        if (!key) {
-                            return e;
-                        }
-
-                        self.set(key, value);
-                    }, false);
-                }(this));
+                document.addEventListener('change', this._listenerHandler(), false);
             } else { // IE8 Support
-                (function(self) {
-                    document.attachEvent('onchange', function (e) {
-                        e = e || window.event;
-                        var target = e.target || e.srcElement,
-                            key = target.getAttribute('data-bind'),
-                            value = target.value;
-                        if (!key) {
-                            return e;
-                        }
+                document.attachEvent('onchange', this._listenerHandler());
+            }
+        },
+        _listenerHandler: function() {
+            self = this;
+            return function (e) {
+                e = e || window.event;
+                var target = e.target || e.srcElement,
+                    key = target.getAttribute('data-bind'),
+                    value = target.value;
+                if (!key) {
+                    return e;
+                }
 
-                        self.set(key, value);
-                    });
-                }(this));
+                self.set(key, value);
             }
         },
         _isInput: function(el) {
