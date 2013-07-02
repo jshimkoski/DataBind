@@ -1,34 +1,27 @@
-(function() {
+(function () {
 
-    // # TODO: Break repeaters out into their own attribute type
+    // TODO: Add repeaters
 
     "use strict";
 
-    var DataBind = window.DataBind = function(key, value) {
+    var DataBind = window.DataBind = function (key, value) {
         this.set(key, value);
         this._listener();
     };
 
     DataBind.prototype = {
-        get: function(key) {
-            if (!key) {
-                return this.model;
-            }
-            return this.model[key];
+        get: function (key) {
+            if (!key) { return this.model; }
+            return this.model[key] || "";
         },
-        set: function(key, value) {
+        set: function (key, value) {
             this.model = this.model || {};
-            if (!key || (typeof key === 'object' && Object.keys(key).length === 0)) {
-                return;
-            }
+            if (!key || (typeof key === 'object' && Object.keys(key).length === 0)) { return; }
             if (typeof key !== 'object') {
                 this.model[key] = value || "";
                 this._changeHandler(key);
             } else {
-
-                // # TODO: fix object replacement/merge (breaks if setting single value in object form)
-
-                this.model = key;
+                this.model = this._mergeObjects(this.model, key);
                 var k = Object.keys(key),
                     length = k.length;
 
@@ -37,7 +30,20 @@
                 }
             }
         },
-        _changeHandler: function(key) {
+        unset: function (key) {
+            if (!key) { return; }
+            if (Array.isArray(key)) {
+                var length = key.length;
+                while (length--) {
+                    delete this.model[key[length]];
+                    this._changeHandler(key[length]);
+                }
+            } else {
+                delete this.model[key];
+                this._changeHandler(key);
+            }
+        },
+        _changeHandler: function (key) {
             var binded = document.querySelectorAll('[data-bind="' + key + '"]'),
                 length = binded.length;
 
@@ -45,38 +51,21 @@
                 var el = binded[length],
                     value = this.get(key);
 
-                if (Array.isArray(value)) { // if value is array, cloneNode repeater
-                    var fragment = document.createDocumentFragment(),
-                        elParent = el.parentNode;
-                    for (var i=0, len=value.length; i < len; i++) {
-                        var cloneNode = el.cloneNode(true);
-                        cloneNode.innerHTML = value[i];
-                        fragment.appendChild(cloneNode);
-                    }
-                    if (elParent) {
-                        elParent.innerHTML = "";
-                        elParent.appendChild(fragment);
-                    }
+                if (this._isInput(el)) {
+                    el.value = value;
                 } else {
-
-                    // # TODO: check if previously an object (breaks repeating lists if switching type)
-
-                    if (this._isInput(el)) {
-                        el.value = value;
-                    } else {
-                        el.innerHTML = value;
-                    }
+                    el.innerHTML = value;
                 }
             }
         },
-        _listener: function() {
+        _listener: function () {
             if (document.addEventListener) {
                 document.addEventListener('change', this._listenerHandler(), false);
             } else { // IE8 Support
                 document.attachEvent('onchange', this._listenerHandler());
             }
         },
-        _listenerHandler: function() {
+        _listenerHandler: function () {
             var self = this;
             return function (e) {
                 e = e || window.event;
@@ -90,11 +79,19 @@
                 self.set(key, value);
             };
         },
-        _isInput: function(el) {
+        _isInput: function (el) {
             var bool = (el.tagName && el.tagName.toLowerCase() === "input") ||
                 (el.tagName && el.tagName.toLowerCase() === "textarea") ||
                 (el.tagName && el.tagName.toLowerCase() === "select");
             return bool;
+        },
+        _mergeObjects: function (obj1, obj2) {
+            var k = Object.keys(obj2),
+                length = k.length;
+            while (length--) {
+                obj1[k[length]] = obj2[k[length]];
+            }
+            return obj1;
         }
     };
 
