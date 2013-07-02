@@ -71,7 +71,9 @@
             };
         },
         _isInput: function(el) {
-            var bool = (el.tagName && el.tagName.toLowerCase() === "input") || (el.tagName && el.tagName.toLowerCase() === "textarea");
+            var bool = (el.tagName && el.tagName.toLowerCase() === "input") ||
+                (el.tagName && el.tagName.toLowerCase() === "textarea") ||
+                (el.tagName && el.tagName.toLowerCase() === "select");
             return bool;
         }
     };

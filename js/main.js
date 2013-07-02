@@ -4,7 +4,9 @@
     var model = window.model = new DataBind({
         'test': 'test',
         'test2': 'test2',
-        'test3': ['item1', 'item2', 'item3']
+        'test3': ['item1', 'item2', 'item3'],
+        'sel': 'Hello',
+        'selList': ['Hello', 'Dolly']
     });
 
 })();
