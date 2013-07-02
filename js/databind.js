@@ -3,7 +3,6 @@
     "use strict";
 
     var DataBind = window.DataBind = function(key, value) {
-        this._init();
         this.set(key, value);
         this._listener();
     };
@@ -17,7 +16,7 @@
         },
         set: function(key, value) {
             this.model = this.model || {};
-            if (!key) {
+            if (!key || (typeof key === 'object' && Object.keys(key).length === 0)) {
                 return;
             }
             if (typeof key !== 'object') {
@@ -25,32 +24,11 @@
                 this._changeHandler(key);
             } else {
                 this.model = key;
-                for (var k in key) {
-                    if (key.hasOwnProperty(k)) {
-                        this._changeHandler(k);
-                    }
-                }
-            }
-        },
-        _init: function() {
-            var binded = document.querySelectorAll('[data-bind]'),
-                length = binded.length;
+                var k = Object.keys(key),
+                    length = k.length;
 
-            while (length--) {
-                var el = binded[length],
-                    key = el.getAttribute('data-bind'),
-                    val = "";
-
-                if (this._isInput(el)) {
-                    val = el.value;
-                    if (val) {
-                        this.set(key, val);
-                    }
-                } else {
-                    val = el.innerHTML;
-                    if (val) {
-                        this.set(key, val);
-                    }
+                while (length--) {
+                    this._changeHandler(k[length]);
                 }
             }
         },
@@ -74,7 +52,7 @@
         _listener: function() {
             if (document.addEventListener) {
                 (function(self) {
-                    document.addEventListener('change', function(e) {
+                    document.addEventListener('change', function (e) {
                         e = e || window.event;
                         var target = e.target || e.srcElement,
                             key = target.getAttribute('data-bind'),
@@ -86,9 +64,9 @@
                         self.set(key, value);
                     }, false);
                 }(this));
-            } else {
+            } else { // IE8 Support
                 (function(self) {
-                    document.attachEvent('onchange', function(e) {
+                    document.attachEvent('onchange', function (e) {
                         e = e || window.event;
                         var target = e.target || e.srcElement,
                             key = target.getAttribute('data-bind'),
