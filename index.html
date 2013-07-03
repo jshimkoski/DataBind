@@ -8,19 +8,26 @@
     <h1 data-bind="test"></h1>
     <input type="text" data-bind="test"/>
 
+    <hr/>
+
     <h1 data-bind="test2"></h1>
     <textarea data-bind="test2"></textarea>
 
-    <input type="text" data-bind="test3"/>
+    <hr/>
+
+    <input type="text" onchange="model.push('test3',this.value); this.value = '';" />
     <ul>
         <li data-repeat="test3"></li>
     </ul>
 
+    <hr/>
+
+    <h1 data-bind="sel"></h1>
     <select data-bind="sel">
         <option data-repeat="selList"></option>
     </select>
-
-    <div data-bind="sel"></div>
+    <br/>
+    <input type="text" onchange="model.push('selList',this.value); this.value = '';" />
 
     <script src="./js/databind.js" type="text/javascript"></script>
     <script src="./js/main.js" type="text/javascript"></script>

@@ -1,7 +1,5 @@
 (function () {
 
-    // TODO: Add repeaters
-
     "use strict";
 
     var DataBind = window.DataBind = function (key, value) {
@@ -30,6 +28,11 @@
                 }
             }
         },
+        push: function (key, value) {
+            var val = this.get(key);
+            val.push(value);
+            this.set(key, val);
+        },
         unset: function (key) {
             if (!key) { return; }
             if (Array.isArray(key)) {
@@ -57,6 +60,8 @@
                     el.innerHTML = value;
                 }
             }
+
+            this._createRepeater(key);
         },
         _listener: function () {
             if (document.addEventListener) {
@@ -78,6 +83,34 @@
 
                 self.set(key, value);
             };
+        },
+        _createRepeater: function (key) {
+            var repeater = document.querySelectorAll('[data-repeat="' + key + '"]'),
+                length = repeater.length;
+
+            while (length--) {
+                var el = repeater[length],
+                    value = this.get(key),
+                    fragment = document.createDocumentFragment(),
+                    parent = el.parentNode;
+
+                for (var i=0, len=value.length; i<len; i++) {
+                    var clone = el.cloneNode(true);
+
+                    if (this._isInput(clone)) {
+                        clone.value = value[i];
+                    } else {
+                        clone.innerHTML = value[i];
+                    }
+
+                    fragment.appendChild(clone);
+                }
+
+                if (parent) {
+                    parent.innerHTML = "";
+                    parent.appendChild(fragment);
+                }
+            }
         },
         _isInput: function (el) {
             var bool = (el.tagName && el.tagName.toLowerCase() === "input") ||
